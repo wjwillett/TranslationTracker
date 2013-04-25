@@ -1,0 +1,26 @@
+
+#translationPluginTooltip {
+  font-family: sans-serif;
+  font-size: 10pt;
+  color: #fff;
+  background: #1d1d1d;
+  display: none;
+  /*--Hides by default--*/
+  padding: 10px;
+  position: absolute;
+  z-index: 9999;
+  border-radius: 6px;
+}
+
+#translationPluginTooltip.de{
+  background: gold;
+}
+
+#translationPluginTooltip.en{
+  background: darkred;
+}
+
+#translationPluginTooltip.fr{
+  background: darkblue;
+}
+
