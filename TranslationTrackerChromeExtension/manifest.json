@@ -6,11 +6,11 @@
   "version": "1.0",
 
   "permissions": [
-     "tabs", "http://*/*"
+     "tabs", "http://*/*","https://*/*"
   ],
   "content_scripts": [
     {
-      "matches": ["http://*/*"],
+      "matches": ["http://*/*", "https://*/*"],
       "css": ["jquery.qtip.css","translation.css"],
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js"]
     }

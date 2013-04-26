@@ -1,26 +1,35 @@
 
 #translationPluginTooltip {
   font-family: sans-serif;
-  font-size: 10pt;
-  color: #fff;
-  background: #1d1d1d;
-  display: none;
-  /*--Hides by default--*/
-  padding: 10px;
+  font-size: 8pt;
+  color: #999;
+  background: white;
+  border: 1px solid whitesmoke;
+  box-shadow: 2px 2px 8px 1px lightgrey;
+  max-width: 400px;
+  padding: 5px;
   position: absolute;
-  z-index: 9999;
-  border-radius: 6px;
+  z-index: 999999999;
+  display: none;   /*--Hides by default--*/
 }
 
-#translationPluginTooltip.de{
-  background: gold;
+#translationPluginTooltip strong{
+  color: #777;
 }
 
-#translationPluginTooltip.en{
-  background: darkred;
+#translationPluginTooltip em{
+  color: #777;
 }
 
-#translationPluginTooltip.fr{
-  background: darkblue;
+#translationPluginTooltip.langde{
+  border-color: gold;
+}
+
+#translationPluginTooltip.langen{
+  border-color: palevioletred;
+}
+
+#translationPluginTooltip.langfr{
+  border-color: lightblue;
 }
 

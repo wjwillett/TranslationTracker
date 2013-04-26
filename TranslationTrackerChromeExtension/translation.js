@@ -28,7 +28,7 @@ function translateWordToTip(e) {
       return;
     }
     
-    tip.removeClass().addClass(fromLanguage).html(translatedWord).show();
+    tip.removeClass().addClass("lang"+fromLanguage).html(translatedWord).show();
     positionTip(tip, e.pageX, e.pageY);
   }
   else tip.hide();
@@ -39,10 +39,14 @@ function translateWordToTip(e) {
 function translateSelectionToTip(e){
   var text = window.getSelection().toString();
   if (text) {
+    
+    //only allow up to 100 characters
+    if(text.length > 100) text = text.slice(0,100) + "...";
+    
     var translatedText = translate(text, fromLanguage, toLanguage, true);
     
     var tip = $("#translationPluginTooltip");
-    tip.removeClass().addClass(fromLanguage).html(translatedText).show();
+    tip.removeClass().addClass("lang"+fromLanguage).html(translatedText).show();
     
     var coords = getSelectionCoords();
     positionTip(tip, coords.x, coords.y);
