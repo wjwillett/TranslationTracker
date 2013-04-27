@@ -41,6 +41,10 @@ function translateWordToTip(e) {
   if(word){
     var lang = $(e.target).attr("lang");
     var translatedWord = translate(word, lang ? lang : fromLanguage, toLanguage, true);
+    
+    var translatedWordUnwrapped = translate(word, lang ? lang : fromLanguage, toLanguage, false);
+    appendToSampleLog(word, translatedWordUnwrapped, $(e.target).text());
+    
     if (!translatedWord){
       tip.hide();
       return;

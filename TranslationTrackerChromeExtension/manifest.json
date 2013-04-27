@@ -12,7 +12,11 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "css": ["jquery.qtip.css","translation.css"],
+<<<<<<< HEAD
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js", "hotkeys.js"]
+=======
+      "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js", "logFileGeneration.js"]
+>>>>>>> Added dummy log file generation.
     }
   ]
 }
