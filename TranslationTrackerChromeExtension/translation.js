@@ -1,7 +1,7 @@
 
-
 var fromLanguage = "fr";
 var toLanguage = "en";
+var clickToggle = true;
 
 function setup(){
   $("body").append("<div id='translationPluginTooltip'></div>");
@@ -9,8 +9,26 @@ function setup(){
   document.addEventListener("select", translateSelectionToTip);
   document.addEventListener("mouseup", translateSelectionToTip);
   document.addEventListener("mousedown", translateSelectionToTip);
+  //Toggle the use of our application on ctrl-j
+  $(document).bind('keydown', 'ctrl+j', function() {
+    clickToggle = !clickToggle;
+    console.log(clickToggle);
+  });
+  document.addEventListener("click", logSelection);
   fromLanguage = detectLanguage();
   if(fromLanguage == "en") toLanguage = "fr";
+}
+
+//On a mouse click, log the word that's clicked if the toggle is on
+function logSelection(e) {
+  if(clickToggle) {
+    var word = getWordAtPoint(e.target, e.x, e.y);
+
+    if(word != null) {
+      //TODO: write it to a DB
+      console.log('Clicked on word: ' + word);
+    }
+  }
 }
 
 //On mouse hover, translate the current word and display a tooltip

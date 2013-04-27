@@ -12,7 +12,7 @@
     {
       "matches": ["http://*/*", "https://*/*"],
       "css": ["jquery.qtip.css","translation.css"],
-      "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js"]
+      "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js", "hotkeys.js"]
     }
   ]
 }
