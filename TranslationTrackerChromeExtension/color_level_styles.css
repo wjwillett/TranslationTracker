@@ -1,0 +1,22 @@
+@charset "utf-8";
+/* CSS Document */
+
+
+span.highlight1{
+	font-weight: bold;
+	font-size: 11px;
+	font-family: verdana;
+	color: #F00;
+}
+span.highlight2{
+	font-weight: bold;
+	font-size: 11px;
+	font-family: verdana;
+	color: #0F0;
+}
+span.highlight3{
+	font-weight: bold;
+	font-size: 11px;
+	font-family: verdana;
+	color: #00F;
+}
