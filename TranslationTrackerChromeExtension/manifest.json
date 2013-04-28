@@ -4,6 +4,11 @@
   "name": "Translation Tracker",
   "description": "Translation prototype.",
   "version": "1.0",
+  "options_page": "options.html",
+
+  "icons": { "16": "dictionary_16.png",
+           "48": "dictionary_48.png",
+          "128": "dictionary_128.png" },
 
   "permissions": [
      "tabs", "http://*/*","https://*/*","file://*/*"
