@@ -1,7 +1,9 @@
 
 var fromLanguage = "fr";
 var toLanguage = "en";
-var clickToggle = true;
+var isEnabled = true;
+
+var currentTranslation = {};
 
 function setup(){
   //Add tooltip
@@ -17,11 +19,11 @@ function setup(){
   
   //Toggle the use of our application on ctrl-j
   $(document).bind('keydown', 'ctrl+j', function() {
-    clickToggle = !clickToggle;
-    console.log(clickToggle);
-    drawOverlay()
+    isEnabled = !isEnabled;
+    console.log(isEnabled);
+    drawOverlay();
+    $("#translationPluginTooltip").hide();
   });
-  document.addEventListener("click", logSelection);
   
   //Set translation language
   fromLanguage = detectLanguage();
@@ -43,16 +45,23 @@ function setup(){
 		processHighlights(Words);
     });
   });
+  
+  
+  //click on tooltip should log the word
+  //TODO: Move to a better location and make sure presses on the button are the actual triggers
+  $("#translationPluginTooltip").mouseup(function(e){
+        storage.addLogItem(currentTranslation.text, currentTranslation.translated,
+                           currentTranslation.fromLanguage, currentTranslation.toLanguage, 
+                           currentTranslation.context);
+      });
 }
 
 
 //On a mouse click, log the word that's clicked if the toggle is on
 function logSelection(e) {
-  if(clickToggle) {
+  if(isEnabled) {
     var word = getWordAtPoint(e.target, e.x, e.y);
-
     if(word != null) {
-      
       var lang = $(e.target).attr("lang");
       var fromLang = (lang ? lang : fromLanguage);
       var translatedWord = translate(word, fromLang, toLanguage, false);
@@ -66,6 +75,7 @@ function logSelection(e) {
 
 //On mouse hover, translate the current word and display a tooltip
 function translateWordToTip(e) {
+  if (!isEnabled) return;
   if (window.getSelection().toString()) return; //don't provide hover tips if we're selecting.
   
   var word = getWordAtPoint(e.target, e.x, e.y);
@@ -92,22 +102,31 @@ function translateWordToTip(e) {
 
 //Following a selection, translate the selected text and display a tooltip
 function translateSelectionToTip(e){
+  if (!isEnabled) return;
   var text = window.getSelection().toString();
   if (text) {
     
-    //only allow up to 100 characters
-    if(text.length > 100) text = text.slice(0,100) + "...";
+    //only allow up to 50 characters
+    if(text.length > 50) text = text.slice(0,50) + "...";
     
     var translatedText = translate(text, fromLanguage, toLanguage, true);
+    var unwrappedTranslatedText = translate(text, fromLanguage, toLanguage, false);
     
     var tip = $("#translationPluginTooltip");
     tip.removeClass().addClass("lang"+fromLanguage).html(translatedText).show();
+    tip.append("<button>remember this phrase</button>");
+    
+    currentTranslation.text = text;
+    currentTranslation.translated = unwrappedTranslatedText;
+    currentTranslation.fromLanguage = fromLanguage;
+    currentTranslation.toLanguage = toLanguage;
+    //TODO: Get the smallest tag containing the selection.
+    currentTranslation.context = ""; 
     
     var coords = getSelectionCoords();
     positionTip(tip, coords.x, coords.y);
   }
 }
-
 
 
 // Recursively search for the word under the current cursor 
@@ -256,7 +275,7 @@ function positionTip(tip, x, y){
 
 //Draw a small overlay in the upper left corner
 function drawOverlay(){
-  $("#translationPluginOverlay").html(fromLanguage + "&rarr;" + toLanguage + " (" + (clickToggle ? "on" : "off") + ")");
+  $("#translationPluginOverlay").html(fromLanguage + "&rarr;" + toLanguage + " (" + (isEnabled ? "on" : "off") + ")");
 }
 
 
