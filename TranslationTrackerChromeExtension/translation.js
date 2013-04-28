@@ -21,7 +21,7 @@ function setup(){
   //Get all previous log items
   var logItems = storage.open(function(){
     var list = storage.getAllLogItems(function(results){
-      alert("log contains " + results.length + " words");
+      console.log("log contains " + results.length + " words");
     });
   });
 }
