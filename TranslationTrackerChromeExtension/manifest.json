@@ -6,11 +6,11 @@
   "version": "1.0",
 
   "permissions": [
-     "tabs", "http://*/*","https://*/*"
+     "tabs", "http://*/*","https://*/*","file://*/*"
   ],
   "content_scripts": [
     {
-      "matches": ["http://*/*", "https://*/*"],
+      "matches": ["http://*/*", "https://*/*", "file://*/*"],
       "css": ["jquery.qtip.css","translation.css"],
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", "languageLookups.js", "translation.js", "hotkeys.js", "logFileGeneration.js"]
     }
