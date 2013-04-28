@@ -17,7 +17,15 @@ function setup(){
   document.addEventListener("click", logSelection);
   fromLanguage = detectLanguage();
   if(fromLanguage == "en") toLanguage = "fr";
+  
+  //Get all previous log items
+  var logItems = storage.open(function(){
+    var list = storage.getAllLogItems(function(results){
+      alert("log contains " + results.length + " results");
+    });
+  });
 }
+
 
 //On a mouse click, log the word that's clicked if the toggle is on
 function logSelection(e) {
@@ -25,11 +33,17 @@ function logSelection(e) {
     var word = getWordAtPoint(e.target, e.x, e.y);
 
     if(word != null) {
-      //TODO: write it to a DB
-      console.log('Clicked on word: ' + word);
+      
+      var lang = $(e.target).attr("lang");
+      var fromLang = (lang ? lang : fromLanguage);
+      var translatedWord = translate(word, fromLang, toLanguage, false);
+      var context = $(e.target).text();
+      
+      storage.addLogItem(word, translatedWord, fromLang, toLanguage, context);
     }
   }
 }
+
 
 //On mouse hover, translate the current word and display a tooltip
 function translateWordToTip(e) {

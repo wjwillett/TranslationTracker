@@ -2,7 +2,7 @@ var latitude = 0.0;
 var longitude = 0.0;
 var sampleRows = [];
 
-
+getLocation();
 
 function getLocation(){
   if (navigator.geolocation){
@@ -13,9 +13,6 @@ function getLocation(){
   }
   else{alert("Geolocation is not supported by this browser.");}
 }
-  
-
-getLocation();
 
 
 function appendToSampleLog(word, translatedWord, context){
