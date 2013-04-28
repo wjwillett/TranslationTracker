@@ -53,7 +53,8 @@ processHighlights = function(Input) {
  *
  * //Call function on document ready
  * $(document).ready(function() {
- *  $('head').append('<link rel="stylesheet" type="text/css" href="color_level_styles.css">');	 
+ *  $('head').append('<link rel="stylesheet" type="text/css" href="color_level_styles.css">');
+ *  $('head').append('<script src="genericUtilities.js"></script>'); 
  * 	processHighlights(Words);
  * });
  */

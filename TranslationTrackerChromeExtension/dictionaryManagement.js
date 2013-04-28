@@ -11,5 +11,9 @@ function getSelectedText() {
   } else if (document.selection) {
     selected = document.selection.createRange().text;
   } else return;
-  alert(selected);
+  selected = trim(selected.toString());
+  $('.box').append(selected+'<br />');
+  selected = new RegExp('('+selected+')', 'gi');
+  var Words = [{ "Word": selected, "Color": 4}];
+  processHighlights(Words);
 }
