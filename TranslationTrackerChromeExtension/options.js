@@ -7,6 +7,10 @@ storage.open(function(){
       return d.translatedWord;
     });
 
+    var wordListOrig = results.map(function(d) {
+      return d.word;
+    });
+
     var dict = [];
 
     for(var i=0;i<wordList.length;i++) {
@@ -17,6 +21,15 @@ storage.open(function(){
     }
 
     wordList = wordList.unique();
+    wordListOrig = wordListOrig.unique();
+    freq_list = [];
+    for(var i=0;i<wordList.length;i++) {
+      freq_list[i] = dict[wordList[i]];
+    }
+
+    $("#list_en").html('<h2>Francais</h2>' + wordList.join('<br>'));
+    $("#list_fr").html('<h2>English</h2>' + wordListOrig.join('<br>'));
+    $("#frequency").html('<h2>Count</h2>' + freq_list.join('<br>'));
 
     console.log(wordList);
     console.log(dict);
