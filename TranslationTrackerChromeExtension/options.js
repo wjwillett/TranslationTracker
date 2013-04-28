@@ -4,14 +4,26 @@ storage.open(function(){
     var fill = d3.scale.category20();
 
     var wordList = results.map(function(d) {
-      return d.word;
+      return d.translatedWord;
     });
 
-    console.log(wordList);
+    var dict = [];
 
-    d3.layout.cloud().size([300, 300])
+    for(var i=0;i<wordList.length;i++) {
+      if(dict[wordList[i]] == null) {
+        dict[wordList[i]] = 0;
+      }
+      dict[wordList[i]] = dict[wordList[i]] + 1;
+    }
+
+    wordList = wordList.unique();
+
+    console.log(wordList);
+    console.log(dict);
+
+    d3.layout.cloud().size([600, 400])
       .words(wordList.map(function(d) {
-        return {text: d, size: 10 + Math.random() * 90};
+        return {text: d, size: 10 * dict[d] + Math.random() * 10};
       }))
       .rotate(function() { return ~~(Math.random() * 2) * 90; })
       .font("Impact")
@@ -21,10 +33,10 @@ storage.open(function(){
 
     function draw(words) {
       d3.select("body").append("svg")
-        .attr("width", 300)
-        .attr("height", 300)
+        .attr("width", 600)
+        .attr("height", 400)
       .append("g")
-        .attr("transform", "translate(150,150)")
+        .attr("transform", "translate(300,200)")
       .selectAll("text")
         .data(words)
       .enter().append("text")
@@ -39,3 +51,19 @@ storage.open(function(){
       }
     });
 });
+
+// Return new array with duplicate values removed
+Array.prototype.unique =
+  function() {
+    var a = [];
+    var l = this.length;
+    for(var i=0; i<l; i++) {
+      for(var j=i+1; j<l; j++) {
+        // If this[i] is found later in the array
+        if (this[i] === this[j])
+          j = ++i;
+      }
+      a.push(this[i]);
+    }
+    return a;
+  };
