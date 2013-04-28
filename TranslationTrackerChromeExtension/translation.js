@@ -4,19 +4,29 @@ var toLanguage = "en";
 var clickToggle = true;
 
 function setup(){
+  //Add tooltip
   $("body").append("<div id='translationPluginTooltip'></div>");
+  //Add mode overlay
+  $("body").append("<div id='translationPluginOverlay'></div>");
+  
+  //Translation on hover
   document.addEventListener("mousemove", translateWordToTip);
   document.addEventListener("select", translateSelectionToTip);
   document.addEventListener("mouseup", translateSelectionToTip);
   document.addEventListener("mousedown", translateSelectionToTip);
+  
   //Toggle the use of our application on ctrl-j
   $(document).bind('keydown', 'ctrl+j', function() {
     clickToggle = !clickToggle;
     console.log(clickToggle);
+    drawOverlay()
   });
   document.addEventListener("click", logSelection);
+  
+  //Set translation language
   fromLanguage = detectLanguage();
   if(fromLanguage == "en") toLanguage = "fr";
+  drawOverlay();
   
   //Get all previous log items
   var logItems = storage.open(function(){
@@ -233,6 +243,11 @@ function positionTip(tip, x, y){
         top: y,
         left: x
     });
+}
+
+//Draw a small overlay in the upper left corner
+function drawOverlay(){
+  $("#translationPluginOverlay").html(fromLanguage + "&rarr;" + toLanguage + " (" + (clickToggle ? "on" : "off") + ")");
 }
 
 
