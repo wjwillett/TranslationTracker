@@ -1,4 +1,3 @@
-console.log(storage);
 storage.open(function(){
     storage.getAllLogItems(function(results){
 
@@ -7,6 +6,8 @@ storage.open(function(){
     var wordList = results.map(function(d) {
       return d.word;
     });
+
+    console.log(wordList);
 
     d3.layout.cloud().size([300, 300])
       .words(wordList.map(function(d) {
