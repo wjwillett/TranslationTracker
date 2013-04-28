@@ -10,7 +10,11 @@ function getSelectedText() {
     selected = document.getSelection();
   } else if (document.selection) {
     selected = document.selection.createRange().text;
-  } else return;
+  } else {
+		console.log("getSelected Error: Caputre Failed");  
+	  return;
+  }
+
   selected = trim(selected.toString());
   selected = new RegExp('('+selected+')', 'gi');
   var Words = [{ "Word": selected, "Color": 4}];
