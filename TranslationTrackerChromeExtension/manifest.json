@@ -16,11 +16,11 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
-      "css": ["jquery.qtip.css","translation.css"],
+      "css": ["jquery.qtip.css","translation.css", "color_level_styles.css"],
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", 
              "languageLookups.js", "translation.js", 
              "hotkeys.js", "logFileGeneration.js",
-             "storage.js"]
+             "storage.js", "genericUtilities.js", "textHighlights.js"]
     }
   ]
 }

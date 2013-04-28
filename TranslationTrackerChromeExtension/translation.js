@@ -32,6 +32,15 @@ function setup(){
   var logItems = storage.open(function(){
     var list = storage.getAllLogItems(function(results){
       console.log("log contains " + results.length + " words");
+	  //Begin Highlighting by processing the returned list
+		var Words = [];
+		var selected = "";
+		
+		for(i = 0; i < results.length; i++){
+			selected = new RegExp('('+results[i].word+')', 'gi');
+			Words.push({ "Word": selected, "Color": 1});	
+		}
+		processHighlights(Words);
     });
   });
 }

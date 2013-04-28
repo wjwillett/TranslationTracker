@@ -37,6 +37,7 @@ processHighlights = function(Input) {
 		$('body').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
 		$('div').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
 		$('p').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
+		$('h2').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
 	}
 }
 
