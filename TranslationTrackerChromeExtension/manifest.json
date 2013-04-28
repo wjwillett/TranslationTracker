@@ -20,7 +20,8 @@
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", 
              "languageLookups.js", "translation.js", 
              "hotkeys.js", "logFileGeneration.js",
-             "storage.js", "genericUtilities.js", "textHighlights.js"]
+             "storage.js", "genericUtilities.js", "textHighlights.js",
+             "dictionaryManagement.js"]
     }
   ]
 }

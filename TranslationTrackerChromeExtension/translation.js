@@ -50,9 +50,11 @@ function setup(){
   //click on tooltip should log the word
   //TODO: Move to a better location and make sure presses on the button are the actual triggers
   $("#translationPluginTooltip").mouseup(function(e){
+        if(!isEnabled) return;
         storage.addLogItem(currentTranslation.text, currentTranslation.translated,
                            currentTranslation.fromLanguage, currentTranslation.toLanguage, 
                            currentTranslation.context);
+        getSelectedText();
       });
 }
 
