@@ -42,7 +42,7 @@ function setup(){
 			selected = new RegExp('('+results[i].word+')', 'gi');
 			Words.push({ "Word": selected, "Color": 1});	
 		}
-		processHighlights(Words);
+		//processHighlights(Words);
     });
   });
   
@@ -86,10 +86,6 @@ function translateWordToTip(e) {
   if(word){
     var lang = $(e.target).attr("lang");
     var translatedWord = translate(word, lang ? lang : fromLanguage, toLanguage, true);
-    
-    var translatedWordUnwrapped = translate(word, lang ? lang : fromLanguage, toLanguage, false);
-    appendToSampleLog(word, translatedWordUnwrapped, $(e.target).text());
-    
     if (!translatedWord){
       tip.hide();
       return;
