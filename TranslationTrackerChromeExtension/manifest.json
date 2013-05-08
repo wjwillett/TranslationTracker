@@ -9,16 +9,26 @@
   "icons": { "16": "dictionary_16.png",
            "48": "dictionary_48.png",
           "128": "dictionary_128.png" },
-
+  "browser_action": {
+    "default_icon": {
+       "19": "dictionary_16.png",
+       "38": "dictionary_48.png"
+    },
+    "default_title": "Translation Tracker"
+  },
   "permissions": [
-     "tabs", "geolocation", "http://*/*","https://*/*","file://*/*"
+    "storage",
+    "tabs", "http://*/*", "https://*/*", "file://*/*", "geolocation"
   ],
+  "background": {
+    "scripts": ["background.js","translation.js", "languageLookups.js"]
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*", "file://*/*"],
       "css": ["jquery.qtip.css","translation.css", "color_level_styles.css"],
       "js": ["jquery-1.9.1.min.js", "jquery.qtip.js", 
-             "languageLookups.js", "translation.js", 
+             "contentscripts.js", 
              "hotkeys.js", "location.js",
              "storage.js", "genericUtilities.js", "textHighlights.js",
              "dictionaryManagement.js"]
