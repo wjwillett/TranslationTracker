@@ -16,6 +16,16 @@ var fromLanguageByTab = {};
 chrome.browserAction.onClicked.addListener(function(tab) {
   isEnabled = !isEnabled;
   localStorage["_TranslationTrackerIsEnabled"] = isEnabled;
+  
+  //tell all tabs about the change
+  chrome.tabs.query({}, function(tabs) {
+    var message = {action: "isEnabledChange", isEnabled:isEnabled};
+    for (var i=0; i<tabs.length; ++i) {
+        chrome.tabs.sendMessage(tabs[i].id, message);
+    }
+  });
+  
+  //update the browserActionButton
   updateBrowserAction();
 });
 
@@ -28,6 +38,9 @@ chrome.runtime.onMessage.addListener(
       sendResponse(isEnabled);
     else if(request.action == "detectLanguage")
       sendResponse(detectLanguage(request.text));
+    else if(request.action == "translate"){
+      sendResponse(translateForTab(request.text, tabId));  
+    }
     else if(sender.tab && request.action == "setLanguages"){
       fromLanguageByTab[tabId] = request.fromLanguage;
       toLanguageByTab[tabId] = request.toLanguage;
@@ -39,6 +52,21 @@ chrome.runtime.onMessage.addListener(
 chrome.tabs.onActivated.addListener(function(activeInfo){
   updateBrowserAction(activeInfo.tabId);
 });
+
+
+//Translate text using settings for the current tab
+function translateForTab(text, tabId, emphasizeTranslatedWords){
+  var fromLanguage = fromLanguageByTab[tabId];
+  var toLanguage = toLanguageByTab[tabId];
+  if(fromLanguage && toLanguage){
+    return { text: text,
+      fromLanguage: fromLanguage,
+      toLanguage: toLanguage,
+      translation: translate(text, fromLanguage, toLanguage, false),
+      translationWithEmphasis: translate(text, fromLanguage, toLanguage, true)};
+  }
+  else return "ERROR - translation languages not set.";
+}
 
 
 //Update the look of the browserAction button
@@ -56,7 +84,7 @@ function updateBrowserAction(tabId){
     chrome.browserAction.setBadgeBackgroundColor({color:languageColor});
   }  
   else{
-   chrome.browserAction.setBadgeText({text:"??"}); 
+   chrome.browserAction.setBadgeText({text:"on"}); 
    chrome.browserAction.setBadgeBackgroundColor({color:languageColors["default"]});
   }
 }

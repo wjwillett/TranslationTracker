@@ -6,12 +6,25 @@ var isEnabled = getIsEnabledFromBackgroundPage();
 
 var currentTranslation = {};
 
-//Checks if the plugin is currently enabled
+//Check with the background script to see if the plugin is currently enabled
 function getIsEnabledFromBackgroundPage(){
    chrome.runtime.sendMessage({action: "getIsEnabled"}, function(response){
       isEnabled = response;
     });
 }
+
+//Handle messages from the background script
+chrome.runtime.onMessage.addListener(
+  function(request, sender, sendResponse) {
+    if(request.action == "isEnabledChange"){
+      if(isEnabled == request.isEnabled) 
+        return;
+      isEnabled = request.isEnabled;
+      if(!isEnabled)
+        $("#translationPluginTooltip").hide();
+      else detectPageLanguage();
+    }
+  });
 
 
 function setup(){
@@ -25,18 +38,7 @@ function setup(){
   document.addEventListener("mousedown", translateSelectionToTip);
   
   //Detect the language of this page and set the to/from languages for future translation
-  var text;
-  if(articleText = $("article").text())
-    text = articleText;
-  else if(pText = $("p").text())
-    text = pText;
-  else text = $("body").text();
-  chrome.runtime.sendMessage({action: "detectLanguage", text: text}, 
-    function(response){
-      fromLanguage = response;
-      if(fromLanguage == "en") toLanguage = "fr";
-      chrome.runtime.sendMessage({action: "setLanguages", fromLanguage: fromLanguage, toLanguage: toLanguage});
-    });
+  detectPageLanguage();
   
   //Get all previous log items
   var logItems = storage.open(function(){
@@ -59,7 +61,7 @@ function setup(){
   //TODO: Move to a better location and make sure presses on the button are the actual triggers
   $("#translationPluginTooltip").mouseup(function(e){
         if(!isEnabled) return;
-        storage.addLogItem(currentTranslation.text, currentTranslation.translated,
+        storage.addLogItem(currentTranslation.text, currentTranslation.translation,
                            currentTranslation.fromLanguage, currentTranslation.toLanguage, 
                            currentTranslation.context);
         getSelectedText();
@@ -67,19 +69,33 @@ function setup(){
 }
 
 
-//On a mouse click, log the word that's clicked if the toggle is on
-function logSelection(e) {
-  if(isEnabled) {
-    var word = getWordAtPoint(e.target, e.x, e.y);
-    if(word != null) {
-      var lang = $(e.target).attr("lang");
-      var fromLang = (lang ? lang : fromLanguage);
-      var translatedWord = translate(word, fromLang, toLanguage, false);
-      var context = $(e.target).text();
-      
-      storage.addLogItem(word, translatedWord, fromLang, toLanguage, context);
-    }
-  }
+//Call the background process to detect the language of the current page
+function detectPageLanguage(){
+  //get sample text from the page
+  var text;
+  if(articleText = $("article").text())
+    text = articleText;
+  else if(pText = $("p").text())
+    text = pText;
+  else text = $("body").text();
+  
+  //detect the language of the current page
+  chrome.runtime.sendMessage({action: "detectLanguage", text: text}, 
+    function(response){ //on reply, tell the background process which languages we'll use for the page
+      fromLanguage = response;
+      if(fromLanguage == "en") toLanguage = "fr";
+      setTranslationLanguages(fromLanguage, toLanguage);
+    });
+}
+
+//Call the background process to set the to and from languages for the current page
+function setTranslationLanguages(fromLanguage, toLanguage){
+  chrome.runtime.sendMessage({action: "setLanguages", fromLanguage: fromLanguage, toLanguage: toLanguage});
+}
+
+//Call the background process to translate text
+function translateText(text, callback){
+  chrome.runtime.sendMessage({action: "translate", text: text}, callback);
 }
 
 
@@ -92,15 +108,15 @@ function translateWordToTip(e) {
   var tip = $("#translationPluginTooltip");
   
   if(word){
-    var lang = $(e.target).attr("lang");
-    var translatedWord = translate(word, lang ? lang : fromLanguage, toLanguage, true);
-    if (!translatedWord){
-      tip.hide();
-      return;
-    }
-    
-    tip.removeClass().addClass("lang"+fromLanguage).html(translatedWord).show();
-    positionTip(tip, e.pageX, e.pageY);
+    translateText(word, function(response){
+      var translatedWord = response.translationWithEmphasis;
+      if(!translatedWord){
+        tip.hide();
+        return;
+      }
+      tip.removeClass().addClass("lang"+fromLanguage).html(translatedWord).show();
+      positionTip(tip, e.pageX, e.pageY);
+    });
   }
   else tip.hide();
 }
@@ -115,22 +131,25 @@ function translateSelectionToTip(e){
     //only allow up to 50 characters
     if(text.length > 50) text = text.slice(0,50) + "...";
     
-    var translatedText = translate(text, fromLanguage, toLanguage, true);
-    var unwrappedTranslatedText = translate(text, fromLanguage, toLanguage, false);
+    translateText(text, function(response){
+      var translation = response.translation;
+      var translationWithEmphasis = response.translationWithEmphasis;
+      var fromLanguage = response.fromLanguage;
+      var toLanguage = response.toLanguage;
+      var tip = $("#translationPluginTooltip");
+      tip.removeClass().addClass("lang"+fromLanguage).html(translationWithEmphasis).show();
+      tip.append("<button>remember this phrase</button>");
     
-    var tip = $("#translationPluginTooltip");
-    tip.removeClass().addClass("lang"+fromLanguage).html(translatedText).show();
-    tip.append("<button>remember this phrase</button>");
+      currentTranslation.text = text;
+      currentTranslation.translation = translation;
+      currentTranslation.fromLanguage = fromLanguage;
+      currentTranslation.toLanguage = toLanguage;
+      //TODO: Get the smallest tag containing the selection.
+      currentTranslation.context = ""; 
     
-    currentTranslation.text = text;
-    currentTranslation.translated = unwrappedTranslatedText;
-    currentTranslation.fromLanguage = fromLanguage;
-    currentTranslation.toLanguage = toLanguage;
-    //TODO: Get the smallest tag containing the selection.
-    currentTranslation.context = ""; 
-    
-    var coords = getSelectionCoords();
-    positionTip(tip, coords.x, coords.y);
+      var coords = getSelectionCoords();
+      positionTip(tip, coords.x, coords.y);
+    });
   }
 }
 
