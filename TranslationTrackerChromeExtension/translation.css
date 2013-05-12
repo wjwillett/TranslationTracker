@@ -1,24 +1,12 @@
 
-#translationPluginOverlay {
-  font-family: sans-serif;
-  font-size: 6pt;
-  padding: 2px;
-  color: #999;
-  background: white;
-  border: 1px solid whitesmoke;
-  box-shadow: rgba(0, 0, 0, 0.65) 2px 2px 8px -1px;
-  position: fixed;
-  top: 0px;
-  left: 0px;
-  z-index: 999999999;
-}
+
 
 #translationPluginTooltip {
   font-family: sans-serif;
   font-size: 8pt;
   color: #999;
   background: white;
-  border: 1px solid whitesmoke;
+  border: 1px solid;
   box-shadow: rgba(0, 0, 0, 0.65) 2px 2px 8px -1px;
   max-width: 400px;
   padding: 5px;
@@ -35,15 +23,26 @@
   color: #777;
 }
 
-#translationPluginTooltip.langde{
-  border-color: gold;
+
+span.translationPhraseHighlight{
+  border-bottom: 1px solid;
 }
 
-#translationPluginTooltip.langen{
-  border-color: palevioletred;
+
+/* Color encodings for languages */
+
+.langfr{
+  border-color: rgb(0, 122, 255) !important;
+  background: rgba(0, 122, 255, 0.1);
 }
 
-#translationPluginTooltip.langfr{
-  border-color: lightblue;
+
+.langen{
+  border-color: rgb(180, 0, 0) !important;
+  background: rgba(180, 0, 0, 0.1);
 }
 
+.langde{
+  border-color: rgb(238, 200, 0) !important;
+  background: rgba(238, 200, 0, 0.1);
+}

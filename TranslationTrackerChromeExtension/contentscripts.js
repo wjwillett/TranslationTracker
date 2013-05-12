@@ -33,9 +33,9 @@ function setup(){
   
   //Translation on hover
   document.addEventListener("mousemove", translateWordToTip);
+  //TODO: Fix to fire just on selections so that other clicks in the document don't break it
   document.addEventListener("select", translateSelectionToTip);
   document.addEventListener("mouseup", translateSelectionToTip);
-  document.addEventListener("mousedown", translateSelectionToTip);
   
   //Detect the language of this page and set the to/from languages for future translation
   detectPageLanguage();
@@ -44,28 +44,14 @@ function setup(){
   var logItems = storage.open(function(){
     var list = storage.getAllLogItems(function(results){
       console.log("log contains " + results.length + " words");
-	  //Begin Highlighting by processing the returned list
-		var Words = [];
-		var selected = "";
-		
-		for(i = 0; i < results.length; i++){
-			selected = new RegExp('('+results[i].word+')', 'gi');
-			Words.push({ "Word": selected, "Color": 1});	
-		}
-		//processHighlights(Words);
+    //Begin Highlighting by processing the returned list
+    var phrases = [];
+    
+    for(i = 0; i < results.length; i++)
+      phrases.push(results[i].word)
+    highlightPhrases(phrases, toLanguage);
     });
   });
-  
-  
-  //click on tooltip should log the word
-  //TODO: Move to a better location and make sure presses on the button are the actual triggers
-  $("#translationPluginTooltip").mouseup(function(e){
-        if(!isEnabled) return;
-        storage.addLogItem(currentTranslation.text, currentTranslation.translation,
-                           currentTranslation.fromLanguage, currentTranslation.toLanguage, 
-                           currentTranslation.context);
-        getSelectedText();
-      });
 }
 
 
@@ -114,7 +100,7 @@ function translateWordToTip(e) {
         tip.hide();
         return;
       }
-      tip.removeClass().addClass("lang"+fromLanguage).html(translatedWord).show();
+      tip.removeClass().addClass("lang"+toLanguage).html(translatedWord).show();
       positionTip(tip, e.pageX, e.pageY);
     });
   }
@@ -137,8 +123,15 @@ function translateSelectionToTip(e){
       var fromLanguage = response.fromLanguage;
       var toLanguage = response.toLanguage;
       var tip = $("#translationPluginTooltip");
-      tip.removeClass().addClass("lang"+fromLanguage).html(translationWithEmphasis).show();
+      tip.removeClass().addClass("lang"+toLanguage).html(translationWithEmphasis).show();
       tip.append("<button>remember this phrase</button>");
+      $("button",tip).click(function(e){
+        if(!isEnabled) return;
+        storage.addLogItem(currentTranslation.text, currentTranslation.translation,
+                           currentTranslation.fromLanguage, currentTranslation.toLanguage, 
+                           currentTranslation.context);
+        getSelectedText();
+      });
     
       currentTranslation.text = text;
       currentTranslation.translation = translation;

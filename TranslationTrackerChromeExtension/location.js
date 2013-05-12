@@ -1,6 +1,6 @@
 var currentLocation;
 
-// getLocation();
+getLocation();
 
 function getLocation(){
   if (navigator.geolocation){

@@ -32,14 +32,15 @@ return this.each(function(){
 * Expects JSON properly formatted
 */
 
-processHighlights = function(Input) {
-	for(i = 0; i < Input.length; i++){ 
-		$('body').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
-		$('div').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
-		$('p').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
-		$('h2').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
-		$('span').replaceText(Input[i].Word, '<span class="highlight'+Input[i].Color+'">$1</span>');
-	}
+function highlightPhrases(phrases, toLanguage) {
+  for(i = 0; i < phrases.length; i++){ 
+    var phraseRegex = new RegExp('('+phrases[i]+')', 'gi');
+    $('body').replaceText(phraseRegex, '<span class="translationPhraseHighlight lang' + toLanguage + '">$1</span>');
+    $('div').replaceText(phraseRegex, '<span class="translationPhraseHighlight lang' + toLanguage + '">$1</span>');
+    $('p').replaceText(phraseRegex, '<span class="translationPhraseHighlight lang' + toLanguage + '">$1</span>');
+    $('h2').replaceText(phraseRegex, '<span class="translationPhraseHighlight lang' + toLanguage + '">$1</span>');
+    $('span').replaceText(phraseRegex, '<span class="translationPhraseHighlight lang' + toLanguage + '">$1</span>');
+  }
 }
 
 /* //Example Constructor: 
@@ -48,15 +49,15 @@ processHighlights = function(Input) {
  *
  * var Words = 
  * [
- *	{ "Word": /(sample)/gi , "Color": 1},
- *	{ "Word": /(text)/gi   , "Color": 2},
- *	{ "Word": /(lorem)/gi  , "Color": 3}
+ *  { "Word": /(sample)/gi , "Color": 1},
+ *  { "Word": /(text)/gi   , "Color": 2},
+ *  { "Word": /(lorem)/gi  , "Color": 3}
  * ]
  *
  * //Call function on document ready
  * $(document).ready(function() {
  *  $('head').append('<link rel="stylesheet" type="text/css" href="color_level_styles.css">');
  *  $('head').append('<script src="genericUtilities.js"></script>'); 
- * 	processHighlights(Words);
+ *   processHighlights(Words);
  * });
  */

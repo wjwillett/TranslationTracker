@@ -79,8 +79,8 @@ storage.addLogItem = function(word, translatedWord,
     "fromLanguage": fromLanguage,
     "toLanguage": toLanguage,
     "context": context,
-    "latitude": latitude,
-    "longitude": longitude
+    "latitude": (currentLocation && currentLocation.coords ? currentLocation.coords[1] : 0),
+    "longitude": (currentLocation && currentLocation.coords ? currentLocation.coords[0] : 0)
   });
   
   request.onsuccess = function(e){
