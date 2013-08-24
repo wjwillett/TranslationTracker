@@ -23,7 +23,8 @@
   color: #777;
 }
 
-#translationPluginTooltip.improving:after{
+
+#translationPluginTooltip.loading:after{
   content: '';
   height: 0px;
   border-right: 10px solid;

@@ -37,8 +37,10 @@ chrome.runtime.onMessage.addListener(
     var tabId = sender.tab.id;
     if(request.action == "getIsEnabled")
       callback(isEnabled);
-    else if(request.action == "detectLanguage")
-      callback(detectLanguage(request.text));
+    else if(request.action == "detectLanguage"){
+      detectLanguage(request.text, callback);
+      return true; //necessary for asynchronous callback
+    }
     else if(request.action == "translate"){
       translateForTab(request.text, tabId, callback);
       return true; //necessary for asynchronous callback

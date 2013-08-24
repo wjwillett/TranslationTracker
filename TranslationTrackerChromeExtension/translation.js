@@ -2,11 +2,17 @@
 
 //TODO: This server instance will eventually need to be locked down
 var TRANSLATION_SERVER = 'http://translationtrack.appspot.com';
+var detectionCache = {};
 var translationCache = {};
+
 
 
 //Fetch a translation from the server
 function translate(text, fromLang, toLang, callback){
+  
+  //strip extra line breaks and white space, then encode 
+  text = text.replace(/(\r\n|\n|\r)/gm," ").replace(/\s+/g," ");
+  text = encodeURIComponent(text);
   
   //Check the local cache of results to avoid unnecessary calls
   var translationKey = fromLang + '::' + toLang + '::' + text;
@@ -17,10 +23,32 @@ function translate(text, fromLang, toLang, callback){
   }
   
   //TODO: Handle Error conditions and load failures appropriately
-  $.ajax(TRANSLATION_SERVER + '/translate?from=' + fromLang + '&to=' + toLang + '&text=' + escape(text),
+  $.ajax(TRANSLATION_SERVER + '/translate?from=' + fromLang + '&to=' + toLang + '&text=' + text,
          {success:function(data, textStatus, jqXHR){
              translationCache[translationKey] = data;
              callback({fromLanguage: fromLang, toLanguage: toLang, text: text, translation:data});
+           }
+         });
+}
+
+//Check with the server to guess the language used
+function detectLanguage(text, callback){
+
+  //shorten, strip extra line breaks and white space, then encode 
+  text = text.replace(/(\r\n|\n|\r)/gm," ").replace(/\s+/g," ");
+  text = text.substr(0,200)
+  text = encodeURIComponent(text);
+
+  //Check the local cache of results to avoid unnecessary calls
+  if(detectionCache[text]){
+    callback(detectionCache[text]);
+    return;
+  }
+  //TODO: Handle Error conditions and load failures appropriately
+  $.ajax(TRANSLATION_SERVER + '/detect?text=' + escape(text),
+         {success:function(data, textStatus, jqXHR){
+             detectionCache[text] = data;
+             callback(data);
            }
          });
 }
@@ -36,8 +64,8 @@ function translateLocally(text, fromLang, toLang, callback){
 }
 
 
-//Stupid-simple language detection.
-function detectLanguage(text){
+//Stupid-simple language detection using the local lookup dictionary.
+function detectLanguageLocally(text, callback){
   //check the first 200 words against all languages
   var words = text.match(/\w+/gi).slice(0,200);
   var hitsByLanguage  = {};
@@ -64,7 +92,7 @@ function detectLanguage(text){
       mostHitsIndex = li;
     }
   }
-  return languages[mostHitsIndex];
+  callback(languages[mostHitsIndex]);
 }
 
 //Translate a phrase from one language to another using a local dictionary (if available).

@@ -1,8 +1,13 @@
+// Content scripts - run inside loaded web pages (wjwillet 2013)
+
+var TRANSLATION_TIP_DELAY = 50;  // Minimum hover time (ms) before a new translation query will be launched 
+var TIP_FADE_DURATION = 200;  // Time for tip fade in/out (ms)
 
 var fromLanguage = "fr";
 var toLanguage = "en";
 
 var isEnabled = getIsEnabledFromBackgroundPage();
+var tipTimer; //Timer for updating the tooltip
 
 var currentTranslation = {};
 
@@ -59,16 +64,21 @@ function setup(){
 function detectPageLanguage(){
   //get sample text from the page
   var text;
-  if(articleText = $("article").text())
+  if(articleText = $("article:visible").text())
     text = articleText;
-  else if(pText = $("p").text())
+  else if(pText = $("p:visible").text())
     text = pText;
-  else text = $("body").text();
+  else if(tText = $("table:visible").text())
+    text = tText;
+  else if(fText = $("form:visible").text())
+    text = tText;
+  else text = $("body:visible").text();
   
   //detect the language of the current page
   chrome.runtime.sendMessage({action: "detectLanguage", text: text}, 
     function(response){ //on reply, tell the background process which languages we'll use for the page
       fromLanguage = response;
+      //TODO: Give more user control over which language pairs should be used
       if(fromLanguage == "en") toLanguage = "fr";
       setTranslationLanguages(fromLanguage, toLanguage);
     });
@@ -90,21 +100,32 @@ function translateWordToTip(e) {
   if (!isEnabled) return;
   if (window.getSelection().toString()) return; //don't provide hover tips if we're selecting.
   
+  // Get the word and tip   
   var word = getWordAtPoint(e.target, e.x, e.y);
   var tip = $("#translationPluginTooltip");
+  // Nix any pending translation
+  window.clearTimeout(tipTimer);
   
-  if(word){
-    translateText(word, function(response){
-        var translatedWord = response.translation;
-        if(!translatedWord){
-          tip.hide();
-          return;
-        }
-        tip.removeClass().addClass("lang"+toLanguage).html(translatedWord).show();
-        positionTip(tip, e.pageX, e.pageY);
-      });
+  if(!word)
+    tip.fadeOut(TIP_FADE_DURATION);
+  else{
+    positionTip(tip, e.pageX, e.pageY);
+    word = word.trim();
+    
+    tipTimer = setTimeout(function(){
+      tip.addClass('loading');
+      translateText(word, function(response){
+          var translatedWord = response.translation;
+          tip.removeClass('loading');
+          if(!translatedWord){
+            tip.fadeOut(TIP_FADE_DURATION);
+            return;
+          }
+          tip.removeClass().addClass("lang"+toLanguage)
+             .html(translatedWord).fadeIn(TIP_FADE_DURATION);
+        });
+    }, TRANSLATION_TIP_DELAY);
   }
-  else tip.hide();
 }
 
 
