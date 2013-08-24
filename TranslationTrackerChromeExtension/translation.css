@@ -23,6 +23,16 @@
   color: #777;
 }
 
+#translationPluginTooltip.improving:after{
+  content: '';
+  height: 0px;
+  border-right: 10px solid;
+  border-color: inherit;
+  border-top: 10px solid rgba(0, 0, 0, 0);
+  position: absolute;
+  bottom:0px;
+  right: 0px;
+}
 
 span.translationPhraseHighlight{
   border-bottom: 1px solid;

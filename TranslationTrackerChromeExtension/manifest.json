@@ -21,7 +21,7 @@
     "tabs", "http://*/*", "https://*/*", "file://*/*", "geolocation"
   ],
   "background": {
-    "scripts": ["background.js","translation.js", "languageLookups.js"]
+    "scripts": ["background.js","translation.js", "languageLookups.js", "jquery-1.9.1.min.js"]
   },
   "content_scripts": [
     {

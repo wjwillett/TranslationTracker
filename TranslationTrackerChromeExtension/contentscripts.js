@@ -95,14 +95,14 @@ function translateWordToTip(e) {
   
   if(word){
     translateText(word, function(response){
-      var translatedWord = response.translationWithEmphasis;
-      if(!translatedWord){
-        tip.hide();
-        return;
-      }
-      tip.removeClass().addClass("lang"+toLanguage).html(translatedWord).show();
-      positionTip(tip, e.pageX, e.pageY);
-    });
+        var translatedWord = response.translation;
+        if(!translatedWord){
+          tip.hide();
+          return;
+        }
+        tip.removeClass().addClass("lang"+toLanguage).html(translatedWord).show();
+        positionTip(tip, e.pageX, e.pageY);
+      });
   }
   else tip.hide();
 }
@@ -111,19 +111,19 @@ function translateWordToTip(e) {
 //Following a selection, translate the selected text and display a tooltip
 function translateSelectionToTip(e){
   if (!isEnabled) return;
-  var text = window.getSelection().toString();
+  var text = window.getSelection().toString().trim();
   if (text) {
-    
     //only allow up to 50 characters
     if(text.length > 50) text = text.slice(0,50) + "...";
+    
+    var tip = $("#translationPluginTooltip");
     
     translateText(text, function(response){
       var translation = response.translation;
       var translationWithEmphasis = response.translationWithEmphasis;
       var fromLanguage = response.fromLanguage;
       var toLanguage = response.toLanguage;
-      var tip = $("#translationPluginTooltip");
-      tip.removeClass().addClass("lang"+toLanguage).html(translationWithEmphasis).show();
+      tip.removeClass().addClass("lang"+toLanguage).html(translation).show();
       tip.append("<button>remember this phrase</button>");
       $("button",tip).click(function(e){
         if(!isEnabled) return;

@@ -1,25 +1,38 @@
-//Translate a phrase from one language to another
-// Dirt-simple placeholder for a smarter algorithm.
-function translate(text, fromLang, toLang, emphasizeTranslatedWords){
-  var lookupName = ("lookup" + fromLang.toLocaleUpperCase() + 
-                    "to" + toLang.toLocaleUpperCase());
-  var lookup = window[lookupName];
-  if (typeof lookup === "undefined") 
-    return "CANNOT TRANSLATE " + fromLang + " to " + toLang + "."
+// Translation methods (wjwillet 2013)
+
+//TODO: This server instance will eventually need to be locked down
+var TRANSLATION_SERVER = 'http://translationtrack.appspot.com';
+var translationCache = {};
+
+
+//Fetch a translation from the server
+function translate(text, fromLang, toLang, callback){
   
-  var translatedText = text;
-  var words = text.match(/\w+/gi);
-  for(var wi in words){
-    var word = words[wi];
-    var translatedWord = lookup[word];
-    if(translatedWord){
-      var regexp = new RegExp("\\b" + word + "\\b","gi");
-      if(emphasizeTranslatedWords)
-        translatedText = translatedText.replace(regexp,"<strong><em>" + translatedWord + "</em></strong>");
-      else translatedText = translatedText.replace(regexp,translatedWord);
-    }
+  //Check the local cache of results to avoid unnecessary calls
+  var translationKey = fromLang + '::' + toLang + '::' + text;
+  if(translationCache[translationKey]){
+    callback({fromLanguage: fromLang, toLanguage: toLang, 
+              text: text, translation:translationCache[translationKey]});
+    return;
   }
-  return translatedText;
+  
+  //TODO: Handle Error conditions and load failures appropriately
+  $.ajax(TRANSLATION_SERVER + '/translate?from=' + fromLang + '&to=' + toLang + '&text=' + escape(text),
+         {success:function(data, textStatus, jqXHR){
+             translationCache[translationKey] = data;
+             callback({fromLanguage: fromLang, toLanguage: toLang, text: text, translation:data});
+           }
+         });
+}
+
+
+//Translate a phrase from one language to another using a local lookup dictionary
+function translateLocally(text, fromLang, toLang, callback){
+  callback({text: text,
+            fromLanguage: fromLang,
+            toLanguage: toLang,
+            translation: dictionaryLookup(text, fromLang, toLang, false),
+            translationWithEmphasis: dictionaryLookup(text, fromLang, toLang, true)});
 }
 
 
@@ -52,4 +65,27 @@ function detectLanguage(text){
     }
   }
   return languages[mostHitsIndex];
+}
+
+//Translate a phrase from one language to another using a local dictionary (if available).
+function dictionaryLookup(text, fromLang, toLang, emphasizeTranslatedWords){
+  var lookupName = ("lookup" + fromLang.toLocaleUpperCase() + 
+                    "to" + toLang.toLocaleUpperCase());
+  var lookup = window[lookupName];
+  if (typeof lookup === "undefined") 
+    return "CANNOT TRANSLATE " + fromLang + " to " + toLang + "."
+  
+  var translatedText = text;
+  var words = text.match(/\w+/gi);
+  for(var wi in words){
+    var word = words[wi];
+    var translatedWord = lookup[word];
+    if(translatedWord){
+      var regexp = new RegExp("\\b" + word + "\\b","gi");
+      if(emphasizeTranslatedWords)
+        translatedText = translatedText.replace(regexp,"<strong><em>" + translatedWord + "</em></strong>");
+      else translatedText = translatedText.replace(regexp,translatedWord);
+    }
+  }
+  return translatedText;
 }

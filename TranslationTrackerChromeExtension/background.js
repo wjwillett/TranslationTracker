@@ -4,6 +4,7 @@ var languageColors = {
   fr: "#00008B", //DarkBlue
   default: "#777"}
 
+
 //The current enabled/disabled state of the extension
 var isEnabled = (localStorage["_TranslationTrackerIsEnabled"] == undefined ?
                  true : localStorage["_TranslationTrackerIsEnabled"] == "true");
@@ -32,14 +33,15 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 
 //Handle messages from the contentScript
 chrome.runtime.onMessage.addListener(
-  function(request, sender, sendResponse) {
+  function(request, sender, callback) {
     var tabId = sender.tab.id;
     if(request.action == "getIsEnabled")
-      sendResponse(isEnabled);
+      callback(isEnabled);
     else if(request.action == "detectLanguage")
-      sendResponse(detectLanguage(request.text));
+      callback(detectLanguage(request.text));
     else if(request.action == "translate"){
-      sendResponse(translateForTab(request.text, tabId));  
+      translateForTab(request.text, tabId, callback);
+      return true; //necessary for asynchronous callback
     }
     else if(sender.tab && request.action == "setLanguages"){
       fromLanguageByTab[tabId] = request.fromLanguage;
@@ -55,15 +57,12 @@ chrome.tabs.onActivated.addListener(function(activeInfo){
 
 
 //Translate text using settings for the current tab
-function translateForTab(text, tabId, emphasizeTranslatedWords){
+function translateForTab(text, tabId, callback){
   var fromLanguage = fromLanguageByTab[tabId];
   var toLanguage = toLanguageByTab[tabId];
   if(fromLanguage && toLanguage){
-    return { text: text,
-      fromLanguage: fromLanguage,
-      toLanguage: toLanguage,
-      translation: translate(text, fromLanguage, toLanguage, false),
-      translationWithEmphasis: translate(text, fromLanguage, toLanguage, true)};
+    translate(text,fromLanguage,toLanguage, callback);
+    //translateLocally(text,fromLanguage,toLanguage,callback);
   }
   else return "ERROR - translation languages not set.";
 }
