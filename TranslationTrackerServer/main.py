@@ -24,6 +24,7 @@ from api_keys import CLIENT_ID, CLIENT_SECRET
 
 OAUTH_EXPIRES_SECONDS = 9 * 60;
 MAX_TEXT_LENGTH = 200;
+MAX_DETECT_LENGTH = 200;
 
 
 class CachedTranslation(db.Model):
@@ -31,6 +32,11 @@ class CachedTranslation(db.Model):
   toLang = db.StringProperty()
   fromText = db.StringProperty()
   toText = db.StringProperty()
+
+
+class CachedDetection(db.Model):
+  text = db.StringProperty()
+  detectedLang = db.StringProperty()
 
 
 class OAuthTokenCache(db.Model):
@@ -76,6 +82,36 @@ class TranslateHandler(webapp2.RequestHandler):
     self.response.write(cachedTranslation.toText)
 
 
+class DetectLanguageHandler(webapp2.RequestHandler):
+  """Detect the language for a string of text."""
+  def get(self):
+    text = self.request.get('text')
+    if not text:
+      self.response.write('Request must include a valid text to run detection on.')
+      return 
+    
+    # Look to see if we've done this detection before
+    text = text[:MAX_DETECT_LENGTH]
+    cachedDetection = CachedDetection.gql('WHERE text = :1', text).get()
+    logging.info(cachedDetection)
+    
+    # If not, look it up and cache it
+    if cachedDetection is None:
+      token = getOAuthToken()
+      detectionUrl = 'http://api.microsofttranslator.com/V2/Ajax.svc/Detect?'
+      detectionArgs = {'text': text.encode('utf-8')}
+      encodedDetectionArgs = urllib.urlencode(detectionArgs)
+      detectionHeaders={'Authorization': 'Bearer ' + token}
+      detectionRequest = urllib2.Request(detectionUrl + encodedDetectionArgs,
+                                           headers=detectionHeaders)
+      detectionResponse = urllib2.urlopen(detectionRequest).read().decode('utf-8')
+      detectionResponse = detectionResponse[2:len(detectionResponse) - 1]
+      logging.info(detectionResponse)
+      cachedDetection = CachedDetection(text=text, detectedLang=detectionResponse)
+      cachedDetection.put()
+    self.response.write(cachedDetection.detectedLang)
+
+
 def getOAuthToken():
   """Get the current OAuth token from the cache and return it, or 
      fetch a fresh one if necessary."""
@@ -106,5 +142,6 @@ def getOAuthToken():
   return cachedToken.token
 
 app = webapp2.WSGIApplication([
-  ('/translate', TranslateHandler)
+  ('/translate', TranslateHandler),
+  ('/detect', DetectLanguageHandler)
 ], debug=True)
