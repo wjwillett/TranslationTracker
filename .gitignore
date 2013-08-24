@@ -1,6 +1,8 @@
 
-.DS_Store
-
+*.DS_Store
+*.pyc
+*.project
+*.pydevproject
 *.sublime-project
-
 *.sublime-workspace
+TranslationTrackerServer/api_keys.py
