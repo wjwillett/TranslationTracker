@@ -94,8 +94,11 @@ class DetectLanguageHandler(webapp2.RequestHandler):
       self.response.write('Request must include a valid text to run detection on.')
       return 
     
-    # Look to see if we've done this detection before
+    # Remove excess white space from the text and trim its length
+    text = ' '.join(text.split())
     text = text[:MAX_DETECT_LENGTH]
+    
+    # Look to see if we've done this detection before
     cachedDetection = CachedDetection.gql('WHERE text = :1', text).get()
     logging.info(cachedDetection)
     

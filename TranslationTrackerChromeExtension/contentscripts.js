@@ -65,14 +65,14 @@ function setup(){
 function detectPageLanguage(){
   //get sample text from the page
   var text;
-  if(articleText = $("article:visible").text())
+  if((articleText = $("article:visible").text().match(/\w+/gi)))
     text = articleText;
-  else if(pText = $("p:visible").text())
+  else if((pText = $("p:visible").text()).match(/\w+/gi))
     text = pText;
-  else if(tText = $("table:visible").text())
+  else if((tText = $("table:visible").text()).match(/\w+/gi))
     text = tText;
-  else if(fText = $("form:visible").text())
-    text = tText;
+  else if((fText = $("form:visible").text()).match(/\w+/gi))
+    text = fText;
   else text = $("body:visible").text();
   
   //detect the language of the current page
