@@ -2,6 +2,7 @@
 
 var TRANSLATION_TIP_DELAY = 50;  // Minimum hover time (ms) before a new translation query will be launched 
 var TIP_FADE_DURATION = 200;  // Time for tip fade in/out (ms)
+var TIP_OFFSET = 10;  // Tip offset from the cursor in x & y (in pixels)
 
 var fromLanguage = "fr";
 var toLanguage = "en";
@@ -229,6 +230,9 @@ function positionTip(tip, x, y){
     
     y = y - tipHeight;
     
+    x += TIP_OFFSET;
+    y -= TIP_OFFSET;
+        
     //Distance of element from the right edge of viewport
     var tipVisX = $(window).width() - (x + tipWidth);
     //Distance of element from the bottom of viewport

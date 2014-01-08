@@ -18,6 +18,7 @@ import webapp2
 import datetime
 import json
 import logging
+import re
 import urllib, urllib2
 from google.appengine.ext import db
 from api_keys import CLIENT_ID, CLIENT_SECRET
@@ -52,7 +53,10 @@ class TranslateHandler(webapp2.RequestHandler):
     fromLang = self.request.get('from')
     text = self.request.get('text')
     
-    if not toLang or not fromLang or not text:
+    twoLetterMatch = '[a-zA-Z][a-zA-Z]'
+
+    if (not toLang or not re.match(twoLetterMatch, toLang) or
+        not fromLang or not re.match(twoLetterMatch, fromLang) or not text):
       self.response.write('Request must include a valid text and to/from languages.')
       return 
     
